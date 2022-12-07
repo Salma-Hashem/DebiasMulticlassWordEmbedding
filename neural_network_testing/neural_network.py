@@ -8,7 +8,11 @@ from tensorflow.keras.layers import Embedding, LSTM, Dense, Bidirectional
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 #data = pd.read_csv('./combined_data.csv')
-data = pd.read_csv('./processed_twitter_data.csv');
+import keras_metrics
+import tensorflow as tf;
+#data = pd.read_csv('./processed_twitter_data.csv');
+data = pd.read_csv('./newest_twitter_data.csv');
+#newest_twitter_data contains processed twitter data
 #text = data["text"];
 #sentiment = data["sentiment"];
 sentiment = data.iloc[:, 0];
@@ -24,7 +28,7 @@ def tokenize(tweet):
     return tweet
 
 text = preprocessed_tweets.apply(tokenize);
-print(text.head(10))
+#print(text.head(10))
 
 
 X_train, X_test , y_train, y_test = train_test_split(text, sentiment, test_size = 0.20)
@@ -35,11 +39,11 @@ tokenizer.fit_on_texts(X_train)
 word_index = tokenizer.word_index
 X_train_sequences = tokenizer.texts_to_sequences(X_train)
 X_test_sequences = tokenizer.texts_to_sequences(X_test)
-print(X_train.shape)
-print(X_train);
-print(X_test.shape);
-print(y_train.shape)
-print(y_test.shape);
+#print(X_train.shape)
+#print(X_train);
+#print(X_test.shape);
+#print(y_train.shape)
+#print(y_test.shape);
 
 
 max_length = 50
@@ -48,14 +52,14 @@ truncation_type='post'
 X_test_padded = pad_sequences(X_test_sequences,maxlen=max_length, padding=padding_type, truncating=truncation_type)
 X_train_padded = pad_sequences(X_train_sequences,maxlen=max_length, padding=padding_type,truncating=truncation_type)
 
-print(X_train_padded.shape)
-print(X_test_padded.shape);
-print(y_train.shape)
-print(y_test.shape);
+#print(X_train_padded.shape)
+#print(X_test_padded.shape);
+#print(y_train.shape)
+#print(y_test.shape);
 
 embeddings_index = dict();
-#f = open('clean_pretrained_embeddings.txt')
-f = open('gender_debiased_embeddings.embed')
+f = open('clean_pretrained_embeddings.txt')
+#f = open('gender_debiased_embeddings.embed')
 #dimension size is 50
 for line in f:
     values = line.split()
@@ -83,7 +87,9 @@ model = Sequential([
     Dense(128, activation='relu'),
     Dense(1, activation='sigmoid')
 ])
-model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy', 'precision', 'recall'])
+#model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy', keras_metrics.precision(), keras_metrics.recall()])
+#model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
+model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy', tf.keras.metrics.Recall(), tf.keras.metrics.Precision()])
 
 log_folder = 'logs'
 callbacks = [
@@ -91,11 +97,15 @@ callbacks = [
             TensorBoard(log_dir=log_folder)
             ]
 num_epochs = 600
-print("so far so good")
-print(X_train_padded.shape)
-print(X_test_padded.shape);
-print(y_train.shape)
-print(y_test.shape);
+#print("so far so good")
+#print(X_train_padded.shape)
+#print(X_test_padded.shape);
+#print(y_train.shape)
+#print(y_test.shape);
 history = model.fit(X_train_padded, y_train, epochs=num_epochs, validation_data=(X_test_padded, y_test),callbacks=callbacks)
-loss, accuracy = model.evaluate(X_test_padded,y_test)
+loss, accuracy, recall, precision = model.evaluate(X_test_padded,y_test)
 print('Test accuracy :', accuracy)
+print('Test recall :', recall)
+print('Test precision :', precision);
+print("test f-score:", ((1/recall) + (1/precision))/2);
+
