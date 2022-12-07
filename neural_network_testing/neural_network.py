@@ -1,5 +1,6 @@
 import pandas as pd;
 import numpy as np;
+import re;
 from sklearn.model_selection import train_test_split;
 from keras.preprocessing.text import Tokenizer
 from keras_preprocessing.sequence import pad_sequences
@@ -11,15 +12,19 @@ data = pd.read_csv('./processed_twitter_data.csv');
 #text = data["text"];
 #sentiment = data["sentiment"];
 sentiment = data.iloc[:, 0];
-text = data.iloc[:, 5];
+preprocessed_tweets = data.iloc[:, 5];
 def tokenize(tweet):
+    #print(tweet)
     tweet = re.sub(r'http\S+', '', tweet)
     tweet = re.sub(r"#(\w+)", '', tweet)
     tweet = re.sub(r"@(\w+)", '', tweet)
     tweet = re.sub(r'[^\w\s]', '', tweet)
     tweet = tweet.strip().lower()
-    tokens = word_tokenize(tweet)
-    return tokens
+    #print(tweet)
+    return tweet
+
+text = preprocessed_tweets.apply(tokenize);
+print(text.head(10))
 
 
 X_train, X_test , y_train, y_test = train_test_split(text, sentiment, test_size = 0.20)
@@ -78,7 +83,7 @@ model = Sequential([
     Dense(128, activation='relu'),
     Dense(1, activation='sigmoid')
 ])
-model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
+model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy', 'precision', 'recall'])
 
 log_folder = 'logs'
 callbacks = [
