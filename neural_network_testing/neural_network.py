@@ -12,6 +12,8 @@ import keras_metrics
 import tensorflow as tf;
 #data = pd.read_csv('./processed_twitter_data.csv');
 data = pd.read_csv('./newest_twitter_data.csv');
+#take half of the data as opposed to all of it
+data = data.sample(frac=0.5);
 #newest_twitter_data contains processed twitter data
 #text = data["text"];
 #sentiment = data["sentiment"];
@@ -33,16 +35,16 @@ def tokenize(tweet):
 #original training data we keep. Currently set to 0.5. ie,
 #we take 50% of the training data bc the file is large,
 #and training takes several hours
-text = text.sample(frac=0.5);
+#preprocessed_tweets = preprocessed_tweets.sample(frac=0.5);
 
 text = preprocessed_tweets.apply(tokenize);
 processed_test = preprocessed_test.apply(tokenize);
 #print(text.head(10))
 X_train = text;
 
-Y_train = sentiment;
+y_train = sentiment;
 X_test = processed_test;
-Y_test = test_sentiment;
+y_test = test_sentiment;
 
 
 #X_train, X_test , y_train, y_test = train_test_split(text, sentiment, test_size = 0.20)
