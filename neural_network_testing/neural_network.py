@@ -13,14 +13,18 @@ import tensorflow as tf;
 #data = pd.read_csv('./processed_twitter_data.csv');
 data = pd.read_csv('./newest_twitter_data.csv');
 #take half of the data as opposed to all of it
-data = data.sample(frac=0.5);
+data = data.sample(frac=(0.01));
 #newest_twitter_data contains processed twitter data
 #text = data["text"];
 #sentiment = data["sentiment"];
-test_data = pd.read_csv('./newest_twitter_test_data.csv');
-test_sentiment = test_data.iloc[:, 0];
+#test_data = pd.read_csv('./newest_twitter_test_data.csv');
+#test_sentiment = test_data.iloc[:, 0];
 sentiment = data.iloc[:, 0];
-preprocessed_test = test_data.iloc[:, 5]
+#preprocessed_test = test_data.iloc[:, 5]
+def convert_data(data):
+    if data == 4:
+        data = 1;
+    return data;
 preprocessed_tweets = data.iloc[:, 5];
 def tokenize(tweet):
     #print(tweet)
@@ -38,16 +42,17 @@ def tokenize(tweet):
 #preprocessed_tweets = preprocessed_tweets.sample(frac=0.5);
 
 text = preprocessed_tweets.apply(tokenize);
-processed_test = preprocessed_test.apply(tokenize);
+sentiment = sentiment.apply(convert_data)
+#processed_test = preprocessed_test.apply(tokenize);
 #print(text.head(10))
-X_train = text;
+#X_train = text;
 
-y_train = sentiment;
-X_test = processed_test;
-y_test = test_sentiment;
+#y_train = sentiment;
+#X_test = processed_test;
+#y_test = test_sentiment;
 
 
-#X_train, X_test , y_train, y_test = train_test_split(text, sentiment, test_size = 0.20)
+X_train, X_test , y_train, y_test = train_test_split(text, sentiment, test_size = 0.20)
 vocab_size = 10000
 oov_token = "<OOV>"
 tokenizer = Tokenizer(num_words = vocab_size, oov_token=oov_token)
@@ -74,8 +79,8 @@ X_train_padded = pad_sequences(X_train_sequences,maxlen=max_length, padding=padd
 #print(y_test.shape);
 
 embeddings_index = dict();
-f = open('clean_pretrained_embeddings.txt')
-#f = open('gender_debiased_embeddings.embed')
+#f = open('clean_pretrained_embeddings.txt')
+f = open('gender_debiased_embeddings.embed')
 #dimension size is 50
 for line in f:
     values = line.split()
@@ -123,5 +128,5 @@ loss, accuracy, recall, precision = model.evaluate(X_test_padded,y_test)
 print('Test accuracy :', accuracy)
 print('Test recall :', recall)
 print('Test precision :', precision);
-print("test f-score:", ((1/recall) + (1/precision))/2);
+print("test f-score:", (2*precision*recall/(precision+recall)));
 
