@@ -15,7 +15,10 @@ data = pd.read_csv('./newest_twitter_data.csv');
 #newest_twitter_data contains processed twitter data
 #text = data["text"];
 #sentiment = data["sentiment"];
+test_data = pd.read_csv('./newest_twitter_test_data.csv');
+test_sentiment = test_data.iloc[:, 0];
 sentiment = data.iloc[:, 0];
+preprocessed_test = test_data.iloc[:, 5]
 preprocessed_tweets = data.iloc[:, 5];
 def tokenize(tweet):
     #print(tweet)
@@ -26,12 +29,23 @@ def tokenize(tweet):
     tweet = tweet.strip().lower()
     #print(tweet)
     return tweet
+#Change the value of frac in order to choose how much of the
+#original training data we keep. Currently set to 0.5. ie,
+#we take 50% of the training data bc the file is large,
+#and training takes several hours
+text = text.sample(frac=0.5);
 
 text = preprocessed_tweets.apply(tokenize);
+processed_test = preprocessed_test.apply(tokenize);
 #print(text.head(10))
+X_train = text;
+
+Y_train = sentiment;
+X_test = processed_test;
+Y_test = test_sentiment;
 
 
-X_train, X_test , y_train, y_test = train_test_split(text, sentiment, test_size = 0.20)
+#X_train, X_test , y_train, y_test = train_test_split(text, sentiment, test_size = 0.20)
 vocab_size = 10000
 oov_token = "<OOV>"
 tokenizer = Tokenizer(num_words = vocab_size, oov_token=oov_token)
