@@ -13,7 +13,7 @@ import tensorflow as tf;
 #data = pd.read_csv('./processed_twitter_data.csv');
 data = pd.read_csv('./newest_twitter_data.csv');
 #take half of the data as opposed to all of it
-data = data.sample(frac=(0.01));
+#data = data.sample(frac=(0.02));
 #newest_twitter_data contains processed twitter data
 #text = data["text"];
 #sentiment = data["sentiment"];
@@ -129,4 +129,11 @@ print('Test accuracy :', accuracy)
 print('Test recall :', recall)
 print('Test precision :', precision);
 print("test f-score:", (2*precision*recall/(precision+recall)));
+
+testing_str = "i hate apples"
+
+#output = model.predict(testing_str);
+#print(testing_str);
+#print("outputted value: " + str(output));
+
 
