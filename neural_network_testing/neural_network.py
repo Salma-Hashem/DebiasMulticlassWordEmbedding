@@ -13,7 +13,7 @@ import tensorflow as tf;
 #data = pd.read_csv('./processed_twitter_data.csv');
 data = pd.read_csv('./newest_twitter_data.csv');
 #take half of the data as opposed to all of it
-#data = data.sample(frac=(0.02));
+data = data.sample(frac=(0.01));
 #newest_twitter_data contains processed twitter data
 #text = data["text"];
 #sentiment = data["sentiment"];
@@ -79,8 +79,10 @@ X_train_padded = pad_sequences(X_train_sequences,maxlen=max_length, padding=padd
 #print(y_test.shape);
 
 embeddings_index = dict();
-#f = open('clean_pretrained_embeddings.txt')
-f = open('gender_debiased_embeddings.embed')
+f = open('clean_pretrained_embeddings.txt')
+#f = open('gender_debiased_embeddings.embed')
+#f = open("race_debiased_embeddings.embed");
+#f = open("religion_debiased_embeddings.embed");
 #dimension size is 50
 for line in f:
     values = line.split()
@@ -113,9 +115,13 @@ model = Sequential([
 model.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy', tf.keras.metrics.Recall(), tf.keras.metrics.Precision()])
 
 log_folder = 'logs'
+checkpoint_path = "./checkpoints/checkpoint.ckpt"
+#checkpoint_dir = os.path.dirname(checkpoint_path)
+cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path, save_weights_only=True, verbose=1)
 callbacks = [
             EarlyStopping(patience = 10),
-            TensorBoard(log_dir=log_folder)
+            TensorBoard(log_dir=log_folder),
+            cp_callback
             ]
 num_epochs = 600
 #print("so far so good")
@@ -135,5 +141,4 @@ testing_str = "i hate apples"
 #output = model.predict(testing_str);
 #print(testing_str);
 #print("outputted value: " + str(output));
-
 
